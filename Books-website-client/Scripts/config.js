@@ -2,13 +2,13 @@
 const config = (() => {
   const hostname = window.location.hostname;
   
-  let apiBaseUrl;
+  let apiBaseUrl = 'http://localhost:5279';
   
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    apiBaseUrl = 'http://localhost:8080'; // Your local API port
-  } else {
-    apiBaseUrl = 'https://proj.ruppin.ac.il/cgroup85/test2/tar1';
-  }
+  // if (hostname === 'localhost' || hostname === '127.0.0.1') {
+  //   apiBaseUrl = 'http://localhost:8080'; // Your local API port
+  // } else {
+  //   apiBaseUrl = 'https://proj.ruppin.ac.il/cgroup85/test2/tar1';
+  // }
   
   return {
     apiBaseUrl,
