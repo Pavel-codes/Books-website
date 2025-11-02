@@ -1,4 +1,4 @@
-﻿const userBooksApiUrl = 'https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/UserBooks';
+﻿import config from './config.js'; // Import config.js
 
 var user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -32,11 +32,12 @@ $('#homeBtn').on('click', function () {
 function fetchBooks() {
     const status = 'want to read'; // הגדרת הסטטוס
 
-    const api = `${userBooksApiUrl}/get?userID=${user.id}&status=${encodeURIComponent(status)}`;
+    const api = config.getUserBooksByStatusUrl(user.id, status); 
+
     // שלח בקשה לשרת
     ajaxCall('GET', api, null,
-        getBooksDisplayDataFromDBSCB,  // פונקציית הצלחה
-        getBooksDisplayDataFromDBECB  // פונקציית שגיאה
+        getBooksDisplayDataFromDBSCB, // פונקציית הצלחה
+        getBooksDisplayDataFromDBECB // פונקציית שגיאה
     );
 }
 
@@ -87,13 +88,15 @@ function renderAllBooksDisplay(books) {
         booksContainer.append(bookElement);
     });
 
-   
+    
 }
 
 // פונקציה להוספת ספר לרשימת הקריאה //Update status from "want to read" to "purchased"
 function addBookToPurchased(userID, bookId) {
     const status = "purchased";
-    const api = `${userBooksApiUrl}/update-status?userID=${userID}&bookID=${bookId}&newStatus=${status}`;
+    
+    const api = config.updateUserBookStatusUrl(userID, bookId, status);
+    
     const data = JSON.stringify(bookId);
     ajaxCall(
         'PUT',
@@ -196,4 +199,3 @@ const quizBtn = document.getElementById("quizBtn");
 $(quizBtn).click(function () {
     window.location.href = "quiz.html";
 });
-

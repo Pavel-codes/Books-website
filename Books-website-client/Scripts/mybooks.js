@@ -1,4 +1,4 @@
-﻿const userBooksApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/UserBooks";
+﻿import config from './config.js';
 
 var user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -121,7 +121,8 @@ function addReadClick(readBtn) {
 // Fetch and display books with status "read" in a separate container
 function fetchReadBooks() {
     const status = 'read'; // Define the status
-    const apiEndpoint = `${userBooksApiUrl}/get?userID=${user.id}&status=${status}`;
+    // const apiEndpoint = `${userBooksApiUrl}/get?userID=${user.id}&status=${status}`;
+    const apiEndpoint = config.getUserBooksUrl(user.id, status);
 
     // Send request to server
     ajaxCall('GET', apiEndpoint, null,

@@ -1,4 +1,5 @@
-const apiUsersUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Users";
+import config from './config.js'; 
+
 var user = JSON.parse(sessionStorage.getItem('user'));
 
 $(document).ready(function () {
@@ -26,7 +27,7 @@ $(document).ready(function () {
     });
 
     $('#loginForm').submit(function (event) {
-        event.preventDefault(); // מונע מהאתר להיתאפס
+        event.preventDefault(); // Prevent form submission
 
         const email = $('#email').val();
         const password = $('#password').val();
@@ -37,7 +38,8 @@ $(document).ready(function () {
             return;
         }
 
-        if (password.length <3) {
+        // Changed validation to be more consistent with the alert message if it's supposed to be 4+
+        if (password.length < 4) { 
             alert("Password must be at least 4 characters long.");
             return;
         }
@@ -50,7 +52,8 @@ $(document).ready(function () {
         submitToServer(loginData);
 
         function submitToServer(loginData) {
-            let api = apiUsersUrl + '/login';
+            // FIXED: Use config.js to get the login API URL
+            let api = config.getLoginUrl();
             ajaxCall('POST', api, JSON.stringify(loginData), postSCBF, postECBF);
         }
 

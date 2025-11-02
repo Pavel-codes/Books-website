@@ -1,8 +1,4 @@
-// JavaScript source code
-const booksApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Books";
-const authorsApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Authors";
-const usersApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Users";
-const userBooksApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/UserBooks";
+import config from './config.js';
 
 var user = JSON.parse(sessionStorage.getItem('user'));
 var homeBtn = document.getElementById("homeBtn");
@@ -20,7 +16,9 @@ $(document).ready(async function () {
 
     getUsers();
     function getUsers() {
-        ajaxCall('GET', usersApiUrl+"/GetAllUsers", "", getUsersSCBF, getUsersECBF);
+        // FIXED: Replaced config.apiBaseUrl + "/GetAllUsers" with the correct config helper function
+        // The endpoint is '/Users/GetAllUsers' (allUsers)
+        ajaxCall('GET', config.getEndpoint('allUsers'), "", getUsersSCBF, getUsersECBF);
     }
 
     function getUsersSCBF(response) {
@@ -216,7 +214,7 @@ function showAllLibraryInfo(response) {
                 data: "thumbNail",
                 title: "Book cover",
                 render: function (data, type, row, meta) {
-                    return '<img src="' + data + '" alt="book image" />';       
+                    return '<img src="' + data + '" alt="book image" />';      
                 }
             },
 
@@ -238,7 +236,8 @@ function showAllLibraryInfo(response) {
 }
 
 function getAllLibraryInfo() {
-    ajaxCall('GET', userBooksApiUrl + "/getBooksNumInLibraries", "", getAllLibraryInfoSCBF, getAllLibraryInfoECBF);
+    // FIXED: Replaced userBooksApiUrl + "/getBooksNumInLibraries" with config helper
+    ajaxCall('GET', config.getEndpoint('userBooksInLibraries'), "", getAllLibraryInfoSCBF, getAllLibraryInfoECBF);
 }
 
 function getAllLibraryInfoSCBF(response) {
@@ -401,7 +400,8 @@ function renderUserBooks(response) {
 }
 
 function getUserLibrary(userId) {
-    ajaxCall('GET', userBooksApiUrl + `/getUserLibrary?userId=${userId}`, "", getUserLibrarySCBF, getUserLibraryECBF);
+    // FIXED: Replaced userBooksApiUrl + /getUserLibrary?userId=${userId} with config helper
+    ajaxCall('GET', config.getUserLibraryUrl(userId), "", getUserLibrarySCBF, getUserLibraryECBF);
 }
 
 function getUserLibrarySCBF(response) {
@@ -417,10 +417,11 @@ function disableInputs() {
     $("input").attr("disabled", "disabled");
 }
 
-///////////// need to check if need to add control for each save button  ///////////////////////////
+///////////// need to check if need to add control for each save button  ///////////////////////////
 function updateUser(data) {
 
-    ajaxCall('PUT', usersApiUrl + `/UpdateUserData/${data.id}`, JSON.stringify(data), updateUserSCBF, updateUserECBF);
+    // FIXED: Replaced config.usersApiUrl + /UpdateUserData/${data.id} with config helper
+    ajaxCall('PUT', config.updateUserDataUrl(data.id), JSON.stringify(data), updateUserSCBF, updateUserECBF);
 }
 
 function updateUserSCBF(response) {
@@ -432,7 +433,8 @@ function updateUserECBF(err) {
 }
 
 function deleteUser(id) {
-    ajaxCall('DELETE', usersApiUrl +"/"+ id, "", deleteUserSCBF, deleteUserECBF);
+    // FIXED: Replaced config.usersApiUrl + "/" + id with config helper
+    ajaxCall('DELETE', config.deleteUserUrl(id), "", deleteUserSCBF, deleteUserECBF);
 }
 
 function deleteUserSCBF(response) {
@@ -452,7 +454,8 @@ function markSelected(btn) {
 }
 
 function getAuthorsLibraryInfo() {
-    ajaxCall('GET', authorsApiUrl + "/getAuthorsNumberInLibraries", "", getAuthorsLibraryInfoSCBF, getAuthorsLibraryInfoECBF);
+    // FIXED: Replaced config.authorsApiUrl + "/getAuthorsNumberInLibraries" with config helper
+    ajaxCall('GET', config.getEndpoint('authorsInLibraries'), "", getAuthorsLibraryInfoSCBF, getAuthorsLibraryInfoECBF);
 }
 
 function getAuthorsLibraryInfoSCBF(response) {

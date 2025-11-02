@@ -1,5 +1,4 @@
-﻿const booksApiURL = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Books";
-const userBooksApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/UserBooks";
+﻿import config from './config.js'; // Adjust the path as necessary
 
 const allEBooks = [];
 var user = JSON.parse(sessionStorage.getItem('user'));
@@ -33,9 +32,9 @@ $(document).ready(function () {
     $('#homeBtn').on('click', function () {
         window.location.href = "../Pages/index.html";
     });
-   
+    
     async function getEBooksDataFromDB() {
-        await ajaxCall("GET", `${booksApiURL}/GetAllEBooks`, "", getEBooksDataFromDBSCB, getEBooksDataFromDBECB);
+        await ajaxCall("GET", config.getEndpoint('allEBooks'), "", getEBooksDataFromDBSCB, getEBooksDataFromDBECB);
     }
 
     function getEBooksDataFromDBSCB(result) {
@@ -99,7 +98,7 @@ $(document).ready(function () {
         }
     });
 
-   
+    
     function showMoreDetails(moreDetails, book) {
         moreDetails.on('click', function () {
             modal.css('display', 'block');
@@ -111,7 +110,7 @@ $(document).ready(function () {
     function renderBooksModal(book) {
         var modalContent = $('#modal-content');
         var bookModal = {};
-        //search for the book in allBooks
+        //search for the book in allEBooks
         allEBooks.forEach(function (books) {
             books.forEach(function (b) {
                 if (b.id === book.id) {
@@ -144,8 +143,12 @@ $(document).ready(function () {
 
     // Function to add a book to the wishlist
     function addBookToWishlist(userId, bookId) {
-        const api = `${userBooksApiUrl}/addBookToWishlist/${userId}`;
+        const api = config.addBookToWishlistUrl(userId); 
         const data = getBookById(bookId);
+        if (!data) {
+            console.error("Error: Could not find book details for ID:", bookId);
+            return;
+        }
         ajaxCall(
             'POST',
             api,
@@ -177,48 +180,28 @@ $(document).ready(function () {
             }
         });
     }
-    //to be deleted
+    
+    // FIXED: Implemented actual book lookup from allEBooks array
     function getBookById(bookId) {
-        // This function should retrieve book details by its ID
-        // You might need to implement an API call or a local function to fetch book details
-        // For now, returning a mock book object
-        return {
-            Id: bookId,
-            Title: "Example Book Title",
-            Subtitle: "Example Subtitle",
-            Language: "English",
-            Publisher: "Example Publisher",
-            PublishedDate: "2024-01-01",
-            Description: "Example book description.",
-            PageCount: 300,
-            PrintType: "BOOK",
-            SmallThumbnail: "http://example.com/small.jpg",
-            Thumbnail: "http://example.com/large.jpg",
-            SaleCountry: "US",
-            Saleability: "FOR_SALE",
-            IsEbook: false,
-            AccessCountry: "US",
-            Viewability: "PARTIAL",
-            PublicDomain: false,
-            TextToSpeechPermission: "ALLOWED",
-            EpubIsAvailable: true,
-            EpubDownloadLink: "http://example.com/epub",
-            EpubAcsTokenLink: "http://example.com/epub-token",
-            PdfIsAvailable: true,
-            PdfDownloadLink: "http://example.com/pdf",
-            PdfAcsTokenLink: "http://example.com/pdf-token",
-            WebReaderLink: "http://example.com/reader",
-            AccessViewStatus: "SAMPLE",
-            QuoteSharingAllowed: true,
-            TextSnippet: "Sample text snippet.",
-            Price: 29.99,
-            ExtarctedText: "Sample extracted text."
-        };
+        let selectedBook = null;
+        // allEBooks is an array of arrays, so iterate both levels
+        allEBooks.forEach(booksArray => {
+            const found = booksArray.find(book => book.id == bookId); // Use loose equality for safety, or ensure ID type
+            if (found) {
+                selectedBook = found;
+            }
+        });
+        
+        if (!selectedBook) {
+            console.warn("Book not found in allEBooks for ID:", bookId);
+        }
+        
+        return selectedBook;
     }
 
     // Function to add a book to the purchased list
     function addBookToPurchased(userId, book) {
-        const api = `${userBooksApiUrl}/addBookToPurchased/${userId}`;
+        const api = config.addBookToPurchasedUrl(userId);
         const data = JSON.stringify(book);
 
         // Print the API URL and data being sent to the console
@@ -250,9 +233,13 @@ $(document).ready(function () {
 
                 if (isLoggedIn()) {
                     const user = JSON.parse(sessionStorage.getItem('user'));
-                    // Assuming you have a way to get the book details by ID
-                    const book = getBookById(buttonId); // You need to implement this function
-                    addBookToPurchased(user.id, book);
+                    // Get the book details by ID
+                    const book = getBookById(buttonId); 
+                    if (book) {
+                        addBookToPurchased(user.id, book);
+                    } else {
+                        alert("Could not find book details to add to purchased list.");
+                    }
                 } else {
                     console.log("User not logged in. Redirecting to login.");
                     alert("Please login or register to add book.");

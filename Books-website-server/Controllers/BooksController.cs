@@ -82,12 +82,12 @@ namespace Books.Server.Controllers
 
         }
         //Top 5 Most Purchased Books
-        [HttpGet("GetTop5MostPurchasedBooks")]
-        public ActionResult<List<Book>> GetTop5MostPurchasedBooks()
+        [HttpGet("GetTopFiveMostPurchasedBooks")]
+        public ActionResult<List<Book>> GetTopFiveMostPurchasedBooks()
         {
             try
             {
-                object topBooks = book.GetTop5MostPurchasedBooks();
+                object topBooks = book.GetTopFiveMostPurchasedBooks();
                 //if (topBooks == null || !topBooks.Any())
                 if (topBooks == null)
                 {

@@ -766,7 +766,7 @@ namespace Books.Server.DAL
             return cmd;
         }
         //Top 5 Most Purchased Books
-        public List<object> GetTop5MostPurchasedBooks()
+        public List<object> GetTopFiveMostPurchasedBooks()
         {
             List<object> fiveTopPurchased = new List<object>();
 

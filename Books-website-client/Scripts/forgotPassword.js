@@ -1,5 +1,5 @@
-const apiUsersUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Users";
-const apiMailUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Mails";
+import config from './config.js'; // Adjust the path as necessary
+
 var user = JSON.parse(sessionStorage.getItem('user'));
 
 $(document).ready(function () {
@@ -20,13 +20,13 @@ $(document).ready(function () {
             EmailToId: email,
             EmailToName: '',
             EmailSubject: 'PLC Reset Password',
-            EmailBody: 'Click on the link to reset your password: https://proj.ruppin.ac.il/cgroup85/test2/tar1/Client/Pages/resetPassword.html'
-
+            // It's best practice to also configure the base URL for the reset link if it changes across environments
+            EmailBody: 'Click on the link to reset your password: placeholder_for_reset_link'
         };
 
         async function checkEmailExists(email) {
-
-            ajaxCall('GET', apiUsersUrl + '/GetUserByEmail/' + email, null, getCheckSCBF, getcheckECBF);
+            const url = config.getUserByEmailUrl(email);
+            ajaxCall('GET', url, null, getCheckSCBF, getcheckECBF);
         }
 
         function getCheckSCBF(response) {
@@ -37,10 +37,7 @@ $(document).ready(function () {
             }
             else {
                 sendEmailToUser(forgotPasswordData);
- 
-
             }
-
         }
 
         function getcheckECBF(response) {
@@ -50,10 +47,9 @@ $(document).ready(function () {
         checkEmailExists(email);
 
 
-        //// Need to implement this function and in SQL too and The server --------------------------------------------------
         async function sendEmailToUser(forgotPasswordData) {
-
-            await ajaxCall('POST', apiMailUrl, JSON.stringify(forgotPasswordData), postSCBF, postECBF);
+            const url = config.getEndpoint('mails');
+            await ajaxCall('POST', url, JSON.stringify(forgotPasswordData), postSCBF, postECBF);
         }
 
         function postSCBF(response) {
@@ -63,16 +59,11 @@ $(document).ready(function () {
 
         function postECBF(response) {
             console.log(response);
-
         }
     });
 
 
-
- 
     $('#homeBtn').on('click', function () {
         window.location.href = "../Pages/index.html";
     });
-
-
 });

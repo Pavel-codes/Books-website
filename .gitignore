@@ -4,6 +4,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+appsettings.json
 bin/
 obj/
 packages/

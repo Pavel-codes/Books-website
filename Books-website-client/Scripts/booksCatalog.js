@@ -1,5 +1,5 @@
-﻿const booksApiURL = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Books";
-const userBooksApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/UserBooks";
+﻿import config from './config.js'; // Adjust the path as necessary
+
 const allBooks = [];
 var user = JSON.parse(sessionStorage.getItem('user'));
 var modal = $('#booksModal');
@@ -36,7 +36,7 @@ $(document).ready(function () {
 
 
     async function getBooksDataFromDB() {
-        await ajaxCall("GET", `${booksApiURL}/GetAllBooks`, "", getBooksDataFromDBSCB, getBooksDataFromDBECB);
+        await ajaxCall("GET", config.getEndpoint('allBooks'), "", getBooksDataFromDBSCB, getBooksDataFromDBECB);
     }
 
     function getBooksDataFromDBSCB(result) {
@@ -76,7 +76,7 @@ $(document).ready(function () {
 
                 var addToWishlistBtn = $('<button class="wishlistButton" data-book-id="' + book.id + '">🤍</button>');
                 bookElement.append(addToWishlistBtn);
-                addWishlistClick(addToWishlistBtn); // הפעלה של הפונקציה
+                addWishlistClick(addToWishlistBtn);
 
 
                 var moreDetails = $('<p id="' + book.id + '" class="more-details">More Details</button></p>');
@@ -103,7 +103,7 @@ $(document).ready(function () {
         }
     });
 
- 
+    
     function showMoreDetails(moreDetails, book) {
         moreDetails.on('click', function () {
             modal.css('display', 'block');
@@ -146,7 +146,7 @@ $(document).ready(function () {
 
     // Function to add a book to the wishlist
     function addBookToWishlist(userId, bookId) {
-        const api = `${userBooksApiUrl}/addBookToWishlist/${userId}`;
+        const api = config.addBookToWishlistUrl(userId);
         const data = getBookById(bookId);
         ajaxCall(
             'POST',
@@ -182,8 +182,28 @@ $(document).ready(function () {
     //to be deleted
     function getBookById(bookId) {
         // This function should retrieve book details by its ID
-        // You might need to implement an API call or a local function to fetch book details
-        // For now, returning a mock book object
+        // For a proper fix, you would need to iterate through 'allBooks' 
+        // to find the full book object matching 'bookId'. 
+        // Returning a mock book object as in the original code, 
+        // but marking it as a required fix.
+        
+        // **FIXME: Implement actual book lookup from 'allBooks' array/structure**
+
+        let selectedBook = null;
+        allBooks.forEach(booksArray => {
+            const found = booksArray.find(book => book.id === bookId);
+            if (found) {
+                selectedBook = found;
+            }
+        });
+
+        // If found, return the actual book object. If not found, fall back to a mock/error.
+        if (selectedBook) {
+            return selectedBook;
+        }
+
+        console.warn("Book not found in allBooks, returning mock data for purchase/wishlist.");
+
         return {
             Id: bookId,
             Title: "Example Book Title",
@@ -220,7 +240,7 @@ $(document).ready(function () {
 
     // Function to add a book to the purchased list
     function addBookToPurchased(userId, book) {
-        const api = `${userBooksApiUrl}/addBookToPurchased/${userId}`;
+        const api = config.addBookToPurchasedUrl(userId);
         const data = JSON.stringify(book);
 
         // Print the API URL and data being sent to the console
@@ -253,7 +273,7 @@ $(document).ready(function () {
                 if (isLoggedIn()) {
                     const user = JSON.parse(sessionStorage.getItem('user'));
                     // Assuming you have a way to get the book details by ID
-                    const book = getBookById(buttonId); // You need to implement this function
+                    const book = getBookById(buttonId); // This function is now updated to look up the book
                     addBookToPurchased(user.id, book);
                 } else {
                     console.log("User not logged in. Redirecting to login.");
@@ -287,7 +307,7 @@ $(document).ready(function () {
 
     }
 
-       
+        
 
     getBooksDataFromDB();
 
@@ -351,10 +371,7 @@ $(document).ready(function () {
         window.location.href = "quiz.html";
     });
 
-  
-
-
-
+    
 
     // Check user status and display appropriate buttons
     if (user && !user.isAdmin) {

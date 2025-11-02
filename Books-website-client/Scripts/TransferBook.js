@@ -1,9 +1,6 @@
-const apiMailUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Mails";
-const userBooksApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/UserBooks";
-const booksApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Books";
-var booksInLibrary = [];
+import config from './config.js'; // Import config.js
 
-// Fetch books with 'read' status for all users except the current user
+var booksInLibrary = [];
 var user = JSON.parse(sessionStorage.getItem('user'));
 
 if (!user) {
@@ -13,10 +10,11 @@ if (!user) {
 
 // not needed
 function getCurrentUserLibrary() {
+    const api = config.getUserLibraryUrl(user.id);
     ajaxCall(
         "GET",
-        `${userBooksApiUrl}/getUserLibrary?userId=${user.id}`,
-        "", 
+        api,
+        "",
         getCurrentUserLibrarySCF,
         getCurrentUserLibraryECF
     );
@@ -33,10 +31,10 @@ function getCurrentUserLibrary() {
 getCurrentUserLibrary();
 
 function fetchBooks() {
-    const api = `${booksApiUrl}/GetAllReadBooks?currentUserId=${user.id}`;
+    const api = config.getAllReadBooksUrl(user.id);
     ajaxCall('GET', api, null,
-        getBooksDisplayDataFromDBSCB,  // Success callback
-        getBooksDisplayDataFromDBECB  // Error callback
+        getBooksDisplayDataFromDBSCB,  // Success callback
+        getBooksDisplayDataFromDBECB  // Error callback
     );
 }
 function getBooksDisplayDataFromDBSCB(result) {
@@ -90,7 +88,8 @@ function renderAllBooksDisplay(books) {
 
 // בודק אם למשתמש שמבקש לרכוש ספר ממשתמש אחר כבר יש את הספר הזה
 function hasBookInLibrary(userId, bookId, callback) {
-    const checkApi = `https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/UserBooks/checkBookInLibrary?userId=${userId}&bookId=${bookId}`;
+    // FIXED: Use config.js for the API endpoint
+    const checkApi = config.checkBookInLibraryUrl(userId, bookId);
 
     fetch(checkApi)
         .then(response => response.json())
@@ -134,7 +133,9 @@ function sendMailToBuyer(button) {
         emailBody: `Hello ${sellerName},\n\nYou have received a purchase request from ${user.userName} to buy the book ${bookName}. Please check your purchase requests to approve or reject the request.\n\nRegards,\nBookstore Team`
 
     }
-    ajaxCall('Post', apiMailUrl, JSON.stringify(mailToSend), handleSuccessMail, handleErrorMail);
+    // FIXED: Use config.js for the API endpoint
+    const mailApi = config.getMailBaseUrl();
+    ajaxCall('Post', mailApi, JSON.stringify(mailToSend), handleSuccessMail, handleErrorMail);
 }
 
 function handleSuccessMail(response) {
@@ -158,7 +159,8 @@ function requestBookPurchase(button) {
         return;
     }
 
-    const api = `${userBooksApiUrl}/addBookPurchaseRequest?buyerId=${buyerId}&sellerId=${sellerId}&bookId=${bookId}`;
+    // FIXED: Use config.js for the API endpoint
+    const api = config.addBookPurchaseRequestUrl(buyerId, sellerId, bookId);
     sendPurchaseRequest(api);
 }
 

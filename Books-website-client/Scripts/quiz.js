@@ -1,12 +1,8 @@
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
+import config from './config.js'; // Import config.js
 
 
-
-const apiURL = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/GetApiKey";
-const userHighScoreApiURL = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Users";
-const booksApiURL = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Books";
 const correctImg = 'https://upload.wikimedia.org/wikipedia/commons/7/73/Flat_tick_icon.svg';
 const incorrectImg = 'https://upload.wikimedia.org/wikipedia/commons/6/69/X_Icon_or_Close_Icon.svg';
 var API_KEY;
@@ -56,7 +52,9 @@ $(document).ready(async function () {
     }
 
     function getUserHighScore() {
-        ajaxCall("GET", `${userHighScoreApiURL}/GetUserHighScore/${user.id}`, `${gameScore}`, getUserHighScoreSCB, getUserHighScoreECB);
+        // FIXED: Use config.js for the API endpoint
+        const api = config.getUserHighScoreUrl(user.id);
+        ajaxCall("GET", api, `${gameScore}`, getUserHighScoreSCB, getUserHighScoreECB);
     }
 
     function getUserHighScoreSCB(result) {
@@ -71,7 +69,9 @@ $(document).ready(async function () {
     getUserHighScore();
 
     function getTitlesAndAuthors() {
-        ajaxCall("GET", `${booksApiURL}/GetTitlesAndAuthors`, "", getTitlesAndAuthorsSCB, getTitlesAndAuthorsECB);
+        // FIXED: Use config.js for the API endpoint
+        const api = config.getBooksTitlesAndAuthorsUrl();
+        ajaxCall("GET", api, "", getTitlesAndAuthorsSCB, getTitlesAndAuthorsECB);
     }
 
     function getTitlesAndAuthorsSCB(result) {
@@ -88,9 +88,10 @@ $(document).ready(async function () {
 
     async function getApiKey() {
         try {
+            // FIXED: Use config.js for the API endpoint
             const response = await $.ajax({
                 type: "GET",
-                url: `${apiURL}`,
+                url: config.getApiKeyUrl(),
             });
             return response.apiKey;
         } catch (err) {
@@ -145,7 +146,7 @@ $(document).ready(async function () {
                     {
                         role: "user",
                         parts: [
-                            { text: "create a question with 1 correct and 3 wrong answers about the book paper money written by Ken Follet or its contents,  display the question and answers as such: Question, Answers, CorrectAnswer, Explanation, each one in a new line each answer in a new line dont display bullets, only respond with the requested information" },
+                            { text: "create a question with 1 correct and 3 wrong answers about the book paper money written by Ken Follet or its contents,  display the question and answers as such: Question, Answers, CorrectAnswer, Explanation, each one in a new line each answer in a new line dont display bullets, only respond with the requested information" },
                         ],
                     },
                     {
@@ -199,7 +200,7 @@ $(document).ready(async function () {
                     {
                         role: "model",
                         parts: [
-                            { text: "Question:  In Herman Melville's \"Moby Dick,\" what does the white whale, Moby Dick, symbolize?\n\nAnswers:\nThe destructive power of nature.\nThe pursuit of revenge.\nThe elusive nature of truth and meaning.\nThe dangers of unchecked ambition.\n\nCorrectAnswer: The elusive nature of truth and meaning.\nExplanation: While Moby Dick can symbolize various things, the text emphasizes its connection to the elusive nature of truth and meaning.  Captain Ahab's obsessive pursuit of the whale represents a desperate search for understanding and a struggle against the unknowable.  Moby Dick embodies the vastness and mystery of the universe, leaving Ahab and the crew grappling with questions of purpose and existence. \n" },
+                            { text: "Question:  In Herman Melville's \"Moby Dick,\" what does the white whale, Moby Dick, symbolize?\n\nAnswers:\nThe destructive power of nature.\nThe pursuit of revenge.\nThe elusive nature of truth and meaning.\nThe dangers of unchecked ambition.\n\nCorrectAnswer: The elusive nature of truth and meaning.\nExplanation: While Moby Dick can symbolize various things, the text emphasizes its connection to the elusive nature of truth and meaning.  Captain Ahab's obsessive pursuit of the whale represents a desperate search for understanding and a struggle against the unknowable.  Moby Dick embodies the vastness and mystery of the universe, leaving Ahab and the crew grappling with questions of purpose and existence. \n" },
                         ],
                     },
                     {
@@ -211,7 +212,7 @@ $(document).ready(async function () {
                     {
                         role: "model",
                         parts: [
-                            { text: "Okay, I understand. I will make sure to generate 4 answers, including 1 correct and 3 incorrect, with no empty lines between the text. \n\nPlease let me know what question you would like me to generate about \"Moby Dick\".  \n" },
+                            { text: "Okay, I understand. I will make sure to generate 4 answers, including 1 correct and 3 incorrect, with no empty lines between the text. \n\nPlease let me know what question you would like me to generate about \"Moby Dick\".  \n" },
                         ],
                     },
                     {
@@ -271,7 +272,7 @@ $(document).ready(async function () {
                     {
                         role: "model",
                         parts: [
-                            { text: "Question: In Herman Melville's \"Moby Dick,\" what does Captain Ahab's obsessive pursuit of the white whale symbolize?\n\nAnswers:\nThe pursuit of revenge for a personal injury.\nThe futile struggle against the forces of nature.\nThe search for meaning and purpose in a vast and indifferent universe.\nThe desire to conquer and dominate the natural world. \n\nCorrectAnswer: The search for meaning and purpose in a vast and indifferent universe.\nExplanation: While Captain Ahab's pursuit of Moby Dick is fueled by a desire for revenge, it also represents a larger struggle for meaning and understanding in a seemingly chaotic world. The whale itself becomes a symbol of the vastness and mystery of the universe, challenging Ahab's human understanding and driving him to a tragic end. \n" },
+                            { text: "Question: In Herman Melville's \"Moby Dick,\" what does Captain Ahab's obsessive pursuit of the white whale symbolize?\n\nAnswers:\nThe pursuit of revenge for a personal injury.\nThe futile struggle against the forces of nature.\nThe search for meaning and purpose in a vast and indifferent universe.\nThe desire to conquer and dominate the natural world. \n\nCorrectAnswer: The search for meaning and purpose in a vast and indifferent universe.\nExplanation: While Captain Ahab's pursuit of Moby Dick is fueled by a desire for revenge, it also represents a larger struggle for meaning and purpose in a seemingly chaotic world. The whale itself becomes a symbol of the vastness and mystery of the universe, challenging Ahab's human understanding and driving him to a tragic end. \n" },
                         ],
                     },
                 ],
@@ -398,7 +399,9 @@ function updateUserHighScore(gameScore) {
 }
 
 function sendUserHighScore() {
-    ajaxCall("PUT", `${userHighScoreApiURL}/UpdateHighScore/${user.id}`, `${gameScore}`, sendUserHighScoreSCB, sendUserHighScoreECB);
+    // FIXED: Use config.js for the API endpoint
+    const api = config.updateUserHighScoreUrl(user.id, gameScore);
+    ajaxCall("PUT", api, `${gameScore}`, sendUserHighScoreSCB, sendUserHighScoreECB);
 }
 
 function sendUserHighScoreSCB(result) {
@@ -505,7 +508,9 @@ $('#highScores').on('click', function (event) {
 });
 
 function getTopHighScores() {
-    ajaxCall("GET", `${userHighScoreApiURL}/GetTopHighScores`, `${gameScore}`, getTopHighScoresSCB, getTopHighScoresECB);
+    // FIXED: Use config.js for the API endpoint
+    const api = config.getTopHighScoresUrl();
+    ajaxCall("GET", api, `${gameScore}`, getTopHighScoresSCB, getTopHighScoresECB);
 }
 
 function getTopHighScoresSCB(result) {

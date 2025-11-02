@@ -238,12 +238,12 @@ public class Book
         }
     }
     //Top 5 Most Purchased Books
-    public List<object> GetTop5MostPurchasedBooks()
+    public List<object> GetTopFiveMostPurchasedBooks()
     {
         DBservices db = new DBservices();
         try
         {
-            return db.GetTop5MostPurchasedBooks();
+            return db.GetTopFiveMostPurchasedBooks();
         }
         catch (Exception ex)
         {

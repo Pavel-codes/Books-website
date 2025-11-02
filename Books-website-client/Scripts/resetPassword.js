@@ -1,5 +1,4 @@
-apiUsersUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Users";
-
+import config from './config.js'; // Import config.js
 
 $(document).ready(function () {
 
@@ -17,6 +16,8 @@ $(document).ready(function () {
         var confirmPassword = $('#confirmPassword').val();
 
         if (password.length < 3) {
+            // Note: Your original check was for '< 3' but your alert said 'at least 4'.
+            // I've kept the original logic for length check.
             alert("Password must be at least 4 characters long.");
             return;
         }
@@ -27,8 +28,8 @@ $(document).ready(function () {
         }
 
         async function checkEmailExists(email) {
-
-            ajaxCall('GET', apiUsersUrl + '/GetUserByEmail/' + email, null, getCheckSCBF, getcheckECBF);
+            const api = config.getUserByEmailUrl(email);
+            ajaxCall('GET', api, null, getCheckSCBF, getcheckECBF);
         }
 
         function getCheckSCBF(response) {
@@ -38,9 +39,7 @@ $(document).ready(function () {
                 return;
             }
             else {
-                updatePassword();               
-              
-
+                updatePassword();
             }
 
         }
@@ -53,8 +52,10 @@ $(document).ready(function () {
 
 
         async function updatePassword() {
-         
-            ajaxCall('PUT', apiUsersUrl + '/UpdateUserPassword/'+email, JSON.stringify(password), updateSCBF, updateECBF);
+            // FIXED: Use config.js for the API endpoint
+            const api = config.updateUserPasswordUrl(email);
+            // The API expects the new password in the request body (JSON.stringify(password))
+            ajaxCall('PUT', api, JSON.stringify(password), updateSCBF, updateECBF);
         }
 
         function updateSCBF(response) {
@@ -66,14 +67,5 @@ $(document).ready(function () {
             console.log(response);
             alert("User not Found change thr mail field");
         }
-
-
-
-
-
     });
-
-
-
-
 });

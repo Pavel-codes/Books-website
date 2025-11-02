@@ -1,4 +1,5 @@
-const apiUsersUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Users";
+import config from './config.js'; // Import config.js
+
 var user = JSON.parse(sessionStorage.getItem('user'));
 
 $(document).ready(function () {
@@ -50,7 +51,9 @@ $(document).ready(function () {
         };
 
         function submitToServer(newUser) {
-            ajaxCall("POST", apiUsersUrl, JSON.stringify(newUser), postSCBF, postECBF);
+            // FIXED: Use config.js for the API endpoint (User registration is a POST to the base URL)
+            const api = config.getUsersBaseUrl(); 
+            ajaxCall("POST", api, JSON.stringify(newUser), postSCBF, postECBF);
         }
 
         function postSCBF(response) {
@@ -65,7 +68,8 @@ $(document).ready(function () {
         }
 
         function autoLogin() {
-            let api = apiUsersUrl + '/login';
+            // FIXED: Use config.js for the API endpoint
+            let api = config.getUserLoginUrl(); 
             let userDetails = { Email: newUser.Email, Password: newUser.Password };
             ajaxCall("POST", api, JSON.stringify(userDetails), postLoginSCBF, postLoginECBF);
         }
@@ -156,4 +160,3 @@ if (user && !user.isAdmin) {
     $('#myBooksBtn').hide();
     $('#adminBtn').hide();
 }
-

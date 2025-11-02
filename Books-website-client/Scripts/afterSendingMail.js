@@ -1,4 +1,7 @@
-const apiMailUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Mails";
+import config from './config.js'; // Adjust the path as necessary
+
+// 2. Use the config helper method to get the correct endpoint URL
+const apiMailUrl = config.getEndpoint('mails');
 
 var userMail = JSON.parse(sessionStorage.getItem('mail'));
 
@@ -16,11 +19,12 @@ $(document).ready(function () {
 
         async function sendEmailToUser(forgotPasswordData) {
 
+            // FIXED: Using the variable apiMailUrl which now uses config.getEndpoint('mails')
             await ajaxCall('POST', apiMailUrl, JSON.stringify(forgotPasswordData), postSCBF, postECBF);
         }
 
         function postSCBF(response) {
-    
+            
             console.log(response);
             alert("Mail Sent");
         }

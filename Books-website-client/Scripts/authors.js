@@ -1,4 +1,5 @@
-﻿const authorsApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Authors";
+﻿import config from './config.js'; // Adjust the path as necessary
+
 const allAuthors = [];
 var user = JSON.parse(sessionStorage.getItem('user'));
 var modal = $('#authorsModal');
@@ -28,7 +29,7 @@ $(document).ready(function () {
     });
 
     async function getAllAuthorsFromDB() {
-        await ajaxCall("GET", authorsApiUrl, "", getAllAuthorsFromDBSCB, getAllAuthorsFromDBECB);
+        await ajaxCall("GET", config.getEndpoint('authors'), "", getAllAuthorsFromDBSCB, getAllAuthorsFromDBECB);
     }
 
     function getAllAuthorsFromDBSCB(result) {
@@ -108,8 +109,8 @@ $(document).ready(function () {
     });
 
     async function getBooksByAuthor(authorId) {
-       await  ajaxCall("GET", `${authorsApiUrl}/GetBooksByAuthor${authorId}`, "", getBooksByAuthorSCB, getBooksByAuthorECB);
-       
+        await ajaxCall("GET", config.getBooksByAuthorUrl(authorId), "", getBooksByAuthorSCB, getBooksByAuthorECB);
+        
     }
 
     function getBooksByAuthorSCB(result){
@@ -123,17 +124,23 @@ $(document).ready(function () {
 
     function renderBooksByAuthor(books) {
         var modalContent = $('#modal-content');
+        modalContent.empty(); // Clear modal content before adding new books
+        modalContent.append('<h2>Books by Author</h2>'); // Add a header to the modal
 
-        books.forEach(book => {
-            const bookElement = $('<div class="book">');
-            bookElement.append('<img src="' + book.image + '" alt="book image" />');
-            bookElement.append('<h3>' + book.title + '</h3>');
-            bookElement.append('<h4>' + book.subtitle + '</h4>');
-            bookElement.append('<p>' + book.description + '</p>');   
+        if (books.length === 0) {
+            modalContent.append('<p>No books found for this author.</p>');
+        } else {
+            books.forEach(book => {
+                const bookElement = $('<div class="book">');
+                bookElement.append('<img src="' + book.image + '" alt="book image" />');
+                bookElement.append('<h3>' + book.title + '</h3>');
+                bookElement.append('<h4>' + book.subtitle + '</h4>');
+                bookElement.append('<p>' + book.description + '</p>');   
 
-            modalContent.append(bookElement);
-            
-        });
+                modalContent.append(bookElement);
+                
+            });
+        }
     }
 
     
@@ -142,11 +149,13 @@ $(document).ready(function () {
         authorBooks.on('click', function () {
             modal.css('display', 'block');
 
-            $('#modal-content').children().slice(1).remove();
+            // The original line was: $('#modal-content').children().slice(1).remove();
+            // I'm replacing this with a full clear and re-append inside renderBooksByAuthor 
+            // to make sure it's always clean and has a header.
             getBooksByAuthor(authorID);
-           
+            
         });
-       
+        
     }
 
     getAllAuthorsFromDB();

@@ -1,12 +1,13 @@
-﻿const apiMailUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/api/Mails";
-const userBooksApiUrl = "https://proj.ruppin.ac.il/cgroup85/test2/tar1/UserBooks";
+﻿import config from './config.js';
 
 var user = JSON.parse(sessionStorage.getItem('user'));
 var requestList = [];
+
 function fetchPurchaseRequests() {
     const sellerId = user.id; // מזהה המוכר הנוכחי//משתמש מחובר 
-    
-    const api = `${userBooksApiUrl}/getPurchaseRequestsForUser/${sellerId}`;
+
+    // FIXED: Use config.js for the API endpoint
+    const api = config.getPurchaseRequestsUrl(sellerId);
 
     ajaxCall('GET', api, null,
         (response) => {
@@ -17,8 +18,8 @@ function fetchPurchaseRequests() {
         }
     );
 }
-function renderPurchaseRequests(requests) { 
-   
+function renderPurchaseRequests(requests) {
+
     var requestsContainer = $('#requests-container');
     requestsContainer.empty();
 
@@ -64,10 +65,7 @@ function renderPurchaseRequests(requests) {
                 updateRequestStatus(requestId, 'Rejected', () => {
                     removeRequestFromList(requestId);
                     sendMailToBuyer(request.buyerUserName, request.bookName, request.buyerEmail, user.userName, 'Rejected');
-
-
                 });
-
             });
         }
     });
@@ -79,9 +77,9 @@ function rejectOtherRequests(requestList, requestId, bookId) {
         if (request.bookId == bookId && request.requestId != requestId) {
             updateRequestStatus(request.requestId, 'Rejected');
             removeRequestFromList(request.requestId);
-            sendMailToBuyer(request.buyerUserName, request.bookName, request.buyerEmail, user.userName,'Rejected');
+            sendMailToBuyer(request.buyerUserName, request.bookName, request.buyerEmail, user.userName, 'Rejected');
         }
-        
+
     });
 }
 
@@ -92,7 +90,9 @@ function sendMailToBuyer(name, bookName, buyerMail, seller, status) {
         emailSubject: 'Purchase Request Status Update',
         emailBody: `Hello ${name},\n\nYour request to purchase ${bookName} from ${seller} is ${status}.\n\nRegards,\nBookstore Team`
     }
-    ajaxCall('Post', apiMailUrl, JSON.stringify(mailToSend), handleSuccessMail, handleErrorMail);
+    // FIXED: Use config.js for the Mail API endpoint
+    const api = config.getMailUrl();
+    ajaxCall('Post', api, JSON.stringify(mailToSend), handleSuccessMail, handleErrorMail);
 }
 
 function handleSuccessMail(response) {
@@ -107,7 +107,9 @@ function handleErrorMail(error) {
 
 function updateRequestStatus(requestId, status, callback) {
     const approvalDate = new Date().toISOString(); // קבלת התאריך הנוכחי בפורמט ISO
-    const api = `${userBooksApiUrl}/updatePurchaseRequestStatus?requestId=${requestId}&approvalStatus=${status}&approvalDate=${encodeURIComponent(approvalDate)}`;
+
+    // FIXED: Use config.js for the API endpoint
+    const api = config.updatePurchaseRequestStatusUrl(requestId, status, approvalDate);
 
     ajaxCall('PUT', api, null,
         (response) => {
@@ -115,7 +117,7 @@ function updateRequestStatus(requestId, status, callback) {
         },
         (error) => {
             console.error('Error updating request status:', error);
-            alert('An error occurred while updating the request status.'); 
+            alert('An error occurred while updating the request status.');
         }
     );
 }
@@ -125,7 +127,10 @@ function manageBookPurchase(buyerId, sellerId, bookId, requestId) {
     // עדכון הסטטוס של הבקשה ל-"Approved" לפני ביצוע העברת הספר
     updateRequestStatus(requestId, 'Approved', () => {
         // אם הבקשה אושרה, בצע את העברת הספר
-        ajaxCall('POST', `${userBooksApiUrl}/Transfer-Book?buyerId=${buyerId}&sellerId=${sellerId}&bookId=${bookId}`, null,
+        // FIXED: Use config.js for the API endpoint
+        const api = config.transferBookUrl(buyerId, sellerId, bookId);
+
+        ajaxCall('POST', api, null,
             (response) => {
                 console.log('Book purchase processed successfully:', response);
                 alert('Book has been transferred successfully.');
@@ -133,29 +138,29 @@ function manageBookPurchase(buyerId, sellerId, bookId, requestId) {
             },
             (error) => {
                 console.error('Error processing book purchase:', error);
-                alert('Already have this book'); 
+                alert('Already have this book');
             }
         );
     });
 }
-function removeRequestFromList(requestId) { 
+
+function removeRequestFromList(requestId) {
     // הסרת הבקשה מהרשימה בדף
     $('#requests-container .request').each(function () {
         var requestElement = $(this);
+        // Find the request ID from the buttons inside the request element
         var dataRequestId = requestElement.find('.approveRequestButton').data('request-id');
         if (dataRequestId == requestId) {
             requestElement.remove();
-            return false; 
+            return false;
         }
     });
 }
 
-
-
-
- //Call fetchPurchaseRequests when the page loads
+//Call fetchPurchaseRequests when the page loads
 window.onload = () => {
     fetchPurchaseRequests();
+    // [Unchanged navigation and dark mode toggle code]
     const allBooksBtn = document.getElementById("allBooksBtn");
     $(allBooksBtn).click(function () {
         window.location.href = "booksCatalog.html";
@@ -203,9 +208,6 @@ window.onload = () => {
         window.location.href = "quiz.html";
     });
 
-  
-  
-
     const toggleModeCheckbox = document.getElementById('toggle-mode');
     const currentTheme = localStorage.getItem('theme');
 
@@ -232,4 +234,3 @@ window.onload = () => {
         window.location.href = "../Pages/index.html";
     });
 };
-
