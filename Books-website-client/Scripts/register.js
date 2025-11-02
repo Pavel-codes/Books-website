@@ -1,4 +1,4 @@
-import config from './config.js'; // Import config.js
+import config from './config.js';
 
 var user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -68,7 +68,6 @@ $(document).ready(function () {
         }
 
         function autoLogin() {
-            // FIXED: Use config.js for the API endpoint
             let api = config.getUserLoginUrl(); 
             let userDetails = { Email: newUser.Email, Password: newUser.Password };
             ajaxCall("POST", api, JSON.stringify(userDetails), postLoginSCBF, postLoginECBF);

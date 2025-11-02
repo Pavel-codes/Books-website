@@ -46,7 +46,6 @@ $(document).ready(function () {
     // --- Data Fetching Functions (API Calls using config) ---
 
     async function getBooksDisplayDataFromDB() {
-        // FIXED: Use config.js
         await ajaxCall("GET", config.getEndpoint('booksDisplay'), "", getBooksDisplayDataFromDBSCB, getBooksDisplayDataFromDBECB);
     }
 
@@ -61,8 +60,7 @@ $(document).ready(function () {
     }
 
     async function getEBooksDisplayDataFromDB() {
-        // FIXED: Use config.js
-        await ajaxCall("GET", config.getEndpoint('ebooksDisplay'), "", getEBooksDisplayDataFromDBSCB, getEBooksDisplayDataFromDBECB);
+        await ajaxCall("GET", config.getEndpoint('eBooksDisplay'), "", getEBooksDisplayDataFromDBSCB, getEBooksDisplayDataFromDBECB);
     }
     function getEBooksDisplayDataFromDBSCB(result) {
         allBooksDisplay.push(result);
@@ -74,7 +72,6 @@ $(document).ready(function () {
     }
 
     async function getAllBooksDataFromDB() {
-        // FIXED: Use config.js
         await ajaxCall("GET", config.getEndpoint('allBooks'), "", getAllBooksDataFromDBSCB, getAllBooksDataFromDBECB);
     }
 
@@ -87,7 +84,6 @@ $(document).ready(function () {
     }
 
     async function getAllEBooksDataFromDB() {
-        // FIXED: Use config.js
         await ajaxCall("GET", config.getEndpoint('allEBooks'), "", getAllEBooksDataFromDBSCB, getAllEBooksDataFromDBECB);
     }
 
@@ -285,7 +281,6 @@ $(document).ready(function () {
         }
     }
 
-
     // --- Wishlist and Purchase Functions ---
 
     function isLoggedIn() {
@@ -400,21 +395,21 @@ $(document).ready(function () {
     // --- Top Books and Recommendations (API Calls using config) ---
 
     // Fetch the top 5 most purchased books
-    async function getTop5MostPurchasedBooks() {
+    async function getTopFiveMostPurchasedBooks() {
         // FIXED: Use config.js
-        await ajaxCall("GET", config.getEndpoint('top5Books'), "", getTop5MostPurchasedBooksSCB, getTop5MostPurchasedBooksECB);
+        await ajaxCall("GET", config.getEndpoint('topFiveBooks'), "", getTopFiveMostPurchasedBooksSCB, getTopFiveMostPurchasedBooksECB);
     }
 
-    function getTop5MostPurchasedBooksSCB(result) {
+    function getTopFiveMostPurchasedBooksSCB(result) {
         console.log("Top 5 Most Purchased Books:", result);
-        renderTop5MostPurchasedBooks(result);
+        renderTopFiveMostPurchasedBooks(result);
     }
 
-    function getTop5MostPurchasedBooksECB(err) {
+    function getTopFiveMostPurchasedBooksECB(err) {
         console.error("Error fetching top 5 most purchased books:", err);
     }
 
-    function renderTop5MostPurchasedBooks(books) {
+    function renderTopFiveMostPurchasedBooks(books) {
         var topBooksContainer = $('#top-books-container');
         topBooksContainer.empty(); 
 
@@ -508,7 +503,7 @@ $(document).ready(function () {
     }
     
     // Call function to load top 5 most purchased books when document is ready
-    getTop5MostPurchasedBooks();
+    getTopFiveMostPurchasedBooks();
 
 
     // --- Modal Functions ---
